@@ -1,0 +1,28 @@
+language: php
+
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - hhvm
+
+before_script:
+  - composer self-update
+  - composer install --dev
+
+script: 
+  - mkdir -p build
+  - mkdir -p build/logs
+  - ./vendor/bin/phpunit --coverage-clover coverage.clover
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+matrix:
+  allow_failures:
+    - php: hhvm
+
+notifications:
+  email:
+    - demonchaux.stephane@gmail.com

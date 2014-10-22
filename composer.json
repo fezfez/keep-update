@@ -1,0 +1,45 @@
+{
+    "name": "fezfez/keep-update",
+    "description": "keep-update",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Stéphane Demonchaux",
+            "email": "demonchaux.stephane@gmail.com"
+        }
+    ],
+    "keywords": [
+        "crud",
+        "zf2",
+        "doctrine2",
+        "pdo",
+        "code generator",
+        "form generator",
+        "SOLID principles"
+    ],
+    "homepage": "https://github.com/fezfez/codeGenerator",
+    "license": "MIT",
+    "require": {
+        "doctrine/instantiator": "~1.0.3",
+        "doctrine/annotations": "1.2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.3.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "KeepUpdate": "src/"
+        }
+    },
+    "support": {
+        "source": "https://github.com/fezfez/keep-update",
+        "email": "demonchaux.stephane@gmail.com",
+        "issues": "https://github.com/fezfez/keep-update/issues",
+        "wiki": "https://github.com/fezfez/keep-update/blob/master/README.md"
+    },
+    "bin": [
+        "bin/code-generator"
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

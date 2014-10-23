@@ -12,7 +12,6 @@ namespace KeepUpdate;
 
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
-use Doctrine\Common\Annotations\AnnotationReader;
 use KeepUpdate\Annotations;
 
 class ArrayValidator

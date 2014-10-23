@@ -23,5 +23,5 @@ class Chain
     /**
      * @var boolean
      */
-    public $optional;
+    public $nullable = false;
 }

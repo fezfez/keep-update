@@ -103,7 +103,9 @@ class ArrayValidator
     private function execAnnotation($contraint, $contraintName, array $data)
     {
         if ($contraint instanceof Annotations\Chain) {
-            if (is_array($data[$contraintName]) === false) {
+            if ($contraint->nullable === true && $data[$contraintName] === null) {
+                return;
+            } elseif (is_array($data[$contraintName]) === false) {
                 throw new InvalidTypeException(
                     sprintf('"%s" must be and array in "%s"', $contraintName, json_encode($data))
                 );

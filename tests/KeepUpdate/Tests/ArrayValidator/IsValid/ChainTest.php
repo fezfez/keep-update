@@ -39,4 +39,16 @@ class ChainTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($result, $sUT->isValid('KeepUpdate\Tests\Sample\ChainMultiple', $result));
     }
+
+    public function testValidWithNullableChain()
+    {
+        $sUT    = ArrayValidatorFactory::getInstance();
+        $result = array('test' => array('test' => 'chain !'));
+
+        $this->assertEquals($result, $sUT->isValid('KeepUpdate\Tests\Sample\ChainNullable', $result));
+
+        $result = array('test' => null);
+
+        $this->assertEquals($result, $sUT->isValid('KeepUpdate\Tests\Sample\ChainNullable', $result));
+    }
 }

@@ -8,9 +8,6 @@ keep-update
 
 Keep update resolve the problem of remaps data from jsonSerialize
 
-
-
-
 Example
 
 I have this dto representation of my model
@@ -69,15 +66,15 @@ $news->setAuthor($author);
 file_put_content('tmp', json_encode($news));
 ```
   
-I will have a json representation in tmp file. Now i want to wake up the representation.
+I will have a json representation in tmp file. Now i want to wake the representation.
 
 ```php
 $newsArray = json_decode(file_get_content('tmp'));
 ```
 
-How to be sure, thats the array i have is a correct representation of my dto's ? You have to create a  validator class, that's very annoying...
+How to be sure that's the array i have is a correct representation of my dto's ? You have to create a  validator class, that's very annoying...
 
-With keepUpdate you only have to add Annotation in your attribute, resume the previous sample
+With keepUpdate you only have to add Annotation in your attribute, resuming the previous sample
 
 ```php
 
@@ -135,17 +132,18 @@ $newsArray = json_decode(file_get_content('tmp'));
 $arrayValidatorFactory = \KeepUpdate\ArrayValidatorFactory::getInstance();
 
 try {
- $arrayValidatorFactory->isValid($news, $newsArray);
+  $arrayValidatorFactory->isValid($news, $newsArray);
 } catch(\KeepUpdate\ValidationException $e) {
- echo 'Not valid !';
+  echo 'Not valid !';
 }
 
 // or
 
 try {
- $arrayValidatorFactory->isValid('News', $newsArray);
+  $arrayValidatorFactory->isValid('News', $newsArray);
 } catch(\KeepUpdate\ValidationException $e) {
- echo 'Not valid !';
+  echo 'Not valid !';
 }
 ```
-  
+
+Validate an array representation of a dto is now more simple

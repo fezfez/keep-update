@@ -2,11 +2,13 @@
 
 namespace KeepUpdate\Annotations;
 
+use KeepUpdate\ValidationException;
+
 /**
  * @Annotation
  *
  */
-class InstanceOfa
+class PlainTextInstanceOf
 {
     /**
      * @var string
@@ -15,20 +17,20 @@ class InstanceOfa
     /**
      * @var boolean
      */
-    public $optional;
+    public $nullable;
 
     public function exec($value)
     {
-        if ($this->optional === true && $value === null) {
+        if ($this->nullable === true && $value === null) {
             return;
         }
 
         if (false === class_exists($value, true)) {
-            throw new \Exception(sprintf('Class "%s" does not exist', $value));
+            throw new ValidationException(sprintf('Class "%s" does not exist', $value));
         }
 
         if ($this->class !== $value) {
-            throw new \Exception(sprintf('Class "%s" must be "%s"', $this->class, $value));
+            throw new ValidationException(sprintf('Class "%s" must be "%s"', $this->class, $value));
         }
     }
 }

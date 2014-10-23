@@ -5,10 +5,7 @@ namespace KeepUpdate;
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use Doctrine\Common\Annotations\AnnotationReader;
-use KeepUpdate\Annotations\InstanceOfa;
-use KeepUpdate\Annotations\ClassImplements;
-use KeepUpdate\Annotations\Main;
-use KeepUpdate\Annotations\Chain;
+use KeepUpdate\Annotations;
 
 class ArrayValidator
 {
@@ -38,31 +35,41 @@ class ArrayValidator
      */
     public function isValid($class, array $data)
     {
-        try {
-            $classInstance    = $this->instantiator->instantiate($class);
-        } catch (InvalidArgumentException $e) {
-            throw new ValidationException($e->getMessage());
+        if (is_object($class) === true) {
+            $classInstance = $class;
+        } else {
+            try {
+                $classInstance = $this->instantiator->instantiate($class);
+            } catch (InvalidArgumentException $e) {
+                throw new ValidationException($e->getMessage());
+            }
         }
 
-        $keys             = array_keys($classInstance->jsonSerialize());
-        $reflectionClass  = new \ReflectionClass($class);
+        if (in_array('JsonSerializable', class_implements($classInstance)) === false) {
+            throw new ValidationException(
+                sprintf('Class "%s" must implements "JsonSerializable"', get_class($classInstance))
+            );
+        }
+
+        $keys            = array_keys($classInstance->jsonSerialize());
+        $reflectionClass = new \ReflectionClass($class);
 
         // Check if all key are there
         foreach ($keys as $key) {
-            if ($this->isAttributeIsSet($data, $key) === false) {
+            if (array_key_exists($key, $data) === false) {
                 throw new ValidationException(sprintf('Key "%s" does not exist in "%s"', $key, json_encode($data)));
             }
         }
 
         // Wake up annotation
-        new Main();
-        new InstanceOfa();
-        new ClassImplements();
-        new Chain();
+        new Annotations\Synchronizer();
+        new Annotations\PlainTextInstanceOf();
+        new Annotations\PlainTextClassImplements();
+        new Annotations\Chain();
 
 
         foreach ($this->annotationReader->getClassAnnotations($reflectionClass) as $contraint) {
-            if ($contraint instanceof Main) {
+            if ($contraint instanceof Annotations\Synchronizer) {
                 $contraint->exec($keys, $classInstance);
             }
         }
@@ -70,27 +77,37 @@ class ArrayValidator
         // Foreach the constraint and execute
         foreach ($this->retrieveConstraint($keys, $classInstance) as $contraintName => $childContraint) {
             foreach ($childContraint as $contraint) {
-                if ($contraint instanceof Chain) {
-                    if ($contraint->optional === true && $data[$contraintName] === null) {
-
-                    } else {
-                        if (is_array($data[$contraintName]) === false) {
-                            throw new ValidationException(sprintf('"%s" must be and array in "%s"', $contraintName, json_encode($data)));
-                        }
-                        try {
-                            $this->isValid($contraint->class, $data[$contraintName]);
-                        } catch (\Exception $e) {
-                            throw new ValidationException(sprintf('%s in "%s" from "%s"', $e->getMessage(), $contraintName, json_encode($data)));
-                        }
-                    }
-                } else {
-                    $contraint->exec($data[$contraintName]);
-                }
+                $this->execConstraint($contraint, $contraintName, $data);
             }
-
         }
 
         return $data;
+    }
+
+    /**
+     * @param class $contraint
+     * @param string $contraintName
+     * @param array $data
+     * @throws ValidationException
+     */
+    private function execConstraint($contraint, $contraintName, array $data)
+    {
+        if ($contraint instanceof Annotations\Chain) {
+            if (is_array($data[$contraintName]) === false) {
+                throw new ValidationException(
+                    sprintf('"%s" must be and array in "%s"', $contraintName, json_encode($data))
+                );
+            }
+            try {
+                $this->isValid($contraint->class, $data[$contraintName]);
+            } catch (\Exception $e) {
+                throw new ValidationException(
+                    sprintf('%s in "%s" from "%s"', $e->getMessage(), $contraintName, json_encode($data))
+                );
+            }
+        } else {
+            $contraint->exec($data[$contraintName]);
+        }
     }
 
     /**
@@ -103,8 +120,9 @@ class ArrayValidator
         // Retrieve the synchorinized property with return data by jsonSerialize
         $sync = array();
         foreach ($keys as $key) {
-            if (property_exists($classInstance, $this->toCamelCase($key)) === true) {
-                $sync[] = $key;
+            $camelCaseKey = $this->toCamelCase($key);
+            if (property_exists($classInstance, $camelCaseKey) === true) {
+                $sync[] = $camelCaseKey;
             }
         }
 
@@ -121,16 +139,6 @@ class ArrayValidator
         }
 
         return $contraints;
-    }
-
-    /**
-     * @param array $data
-     * @param string $attribute
-     * @return boolean
-     */
-    private function isAttributeIsSet(array $data, $attribute)
-    {
-        return (false === array_key_exists($attribute, $data) || null === $data[$attribute]) ? false : true;
     }
 
     /**

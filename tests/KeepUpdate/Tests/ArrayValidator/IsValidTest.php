@@ -5,6 +5,8 @@ namespace KeepUpdate\Tests\ArrayValidator;
 use KeepUpdate\ArrayValidator;
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Common\Annotations\AnnotationReader;
+use KeepUpdate\Tests\Sample\WithoutAnnotation;
+use KeepUpdate\Tests\Sample\WithoutJsonSerializableAndAnnotation;
 
 class IsValidTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,48 +21,51 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassFailWithoutAnnotationButNoSync()
     {
-    	$sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
 
-    	$this->setExpectedException('KeepUpdate\ValidationException');
+        $this->setExpectedException('KeepUpdate\ValidationException');
 
-    	$sUT->isValid('KeepUpdate\Tests\Sample\SimpleInstanceOfa', array());
+        $sUT->isValid('KeepUpdate\Tests\Sample\WithoutAnnotation', array());
     }
 
     public function testClassFailWithoutAnnotationSyncButEmpty()
     {
-    	$sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
 
-    	$this->setExpectedException('KeepUpdate\ValidationException');
+        $this->setExpectedException('KeepUpdate\ValidationException');
 
-    	$sUT->isValid('KeepUpdate\Tests\Sample\SimpleInstanceOfa', array('test'));
+        $sUT->isValid('KeepUpdate\Tests\Sample\WithoutAnnotation', array('test'));
     }
 
     public function testClassValidWithoutAnnotationAndSync()
     {
-    	$sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
-    	$data = array('test' => 'im in !');
+        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $data = array('test' => 'im in !');
 
-    	$this->assertEquals(
-    		$data,
-    		$sUT->isValid('KeepUpdate\Tests\Sample\SimpleInstanceOfa', $data)
-    	);
+        $this->assertEquals(
+            $data,
+            $sUT->isValid('KeepUpdate\Tests\Sample\WithoutAnnotation', $data)
+        );
     }
 
-    public function testClassFailWithChainIsNotAnArray()
+    public function testClassValidWithoutAnnotationAndSyncWithRealInstance()
     {
-    	$sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $data = array('test' => 'im in !');
 
-    	$this->setExpectedException('KeepUpdate\ValidationException');
-
-    	$sUT->isValid('KeepUpdate\Tests\Sample\ChainDoesNotExist', array('test' => 'im not an array'));
+        $this->assertEquals(
+            $data,
+            $sUT->isValid(new WithoutAnnotation(), $data)
+        );
     }
 
-    public function testClassFailWithChainDoesNotExist()
+    public function testClassValidWithoutAnnotationAndSyncAndJsonSerializableWithRealInstance()
     {
-    	$sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $data = array('test' => 'im in !');
 
-    	$this->setExpectedException('KeepUpdate\ValidationException');
+        $this->setExpectedException('KeepUpdate\ValidationException');
 
-    	$sUT->isValid('KeepUpdate\Tests\Sample\ChainDoesNotExist', array('test' => array('im in !')));
+        $sUT->isValid(new WithoutJsonSerializableAndAnnotation(), $data);
     }
 }

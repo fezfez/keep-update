@@ -4,12 +4,12 @@ namespace KeepUpdate\Tests\Sample;
 
 use KeepUpdate\Annotations;
 
-class ChainDoesNotExist implements \JsonSerializable
+/**
+ * @author Stagiaire
+ * @Annotations\Synchronizer(strict=true);
+ */
+class Synchronizer implements \JsonSerializable
 {
-    /**
-     * @Annotations\Chain(class="doesNotExist");
-     * @var unknown
-     */
     private $test = null;
 
     public function jsonSerialize()

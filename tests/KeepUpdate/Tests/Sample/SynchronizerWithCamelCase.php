@@ -2,7 +2,13 @@
 
 namespace KeepUpdate\Tests\Sample;
 
-class CamelCase implements \JsonSerializable
+use KeepUpdate\Annotations;
+
+/**
+ * @author Stagiaire
+ * @Annotations\Synchronizer(strict=true);
+ */
+class SynchronizerWithCamelCase implements \JsonSerializable
 {
     private $testCamelCase = null;
 

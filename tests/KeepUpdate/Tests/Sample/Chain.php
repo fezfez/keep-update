@@ -4,10 +4,10 @@ namespace KeepUpdate\Tests\Sample;
 
 use KeepUpdate\Annotations;
 
-class ChainDoesNotExist implements \JsonSerializable
+class Chain implements \JsonSerializable
 {
     /**
-     * @Annotations\Chain(class="doesNotExist");
+     * @Annotations\Chain(class="KeepUpdate\Tests\Sample\WithoutAnnotation");
      * @var unknown
      */
     private $test = null;

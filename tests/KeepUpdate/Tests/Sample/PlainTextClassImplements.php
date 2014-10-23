@@ -4,11 +4,11 @@ namespace KeepUpdate\Tests\Sample;
 
 use KeepUpdate\Annotations;
 
-class ChainDoesNotExist implements \JsonSerializable
+class PlainTextClassImplements implements \JsonSerializable
 {
     /**
-     * @Annotations\Chain(class="doesNotExist");
-     * @var unknown
+     * @Annotations\PlainTextClassImplements(interface="KeepUpdate\Tests\Sample\DummieInterface")
+     * @var string
      */
     private $test = null;
 

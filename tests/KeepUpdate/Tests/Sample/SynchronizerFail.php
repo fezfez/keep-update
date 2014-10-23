@@ -4,18 +4,18 @@ namespace KeepUpdate\Tests\Sample;
 
 use KeepUpdate\Annotations;
 
-class ChainDoesNotExist implements \JsonSerializable
+/**
+ * @author Stagiaire
+ * @Annotations\Synchronizer(strict=true);
+ */
+class SynchronizerFail implements \JsonSerializable
 {
-    /**
-     * @Annotations\Chain(class="doesNotExist");
-     * @var unknown
-     */
     private $test = null;
 
     public function jsonSerialize()
     {
         return array(
-            'test' => $this->test
+            'testmyself' => $this->test
         );
     }
 }

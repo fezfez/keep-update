@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the KeepUpdate package.
+  * This file is part of the KeepUpdate package.
  *
  * (c) Stéphane Demonchaux <demonchaux.stephane@gmail.com>
  *
@@ -10,7 +10,7 @@
 
 namespace KeepUpdate;
 
-class ValidationException extends \Exception
+class WrongImplementationException extends ValidationException
 {
 
 }

@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the KeepUpdate package.
+ *
+ * (c) Stéphane Demonchaux <demonchaux.stephane@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace KeepUpdate;
 
@@ -14,18 +22,24 @@ class ArrayValidator
      */
     private $instantiator = null;
     /**
-     * @var AnnotationReader
+     * @var AnnotationDAO
      */
-    private $annotationReader = null;
+    private $annotationDAO = null;
+    /**
+     * @var PropertyDAO
+     */
+    private $propertyDAO = null;
 
     /**
      * @param Instantiator $instantiator
-     * @param AnnotationReader $annotationReader
+     * @param AnnotationDAO $annotationDAO
+     * @param PropertyDAO $propertyDAO
      */
-    public function __construct(Instantiator $instantiator, AnnotationReader $annotationReader)
+    public function __construct(Instantiator $instantiator, AnnotationDAO $annotationDAO, PropertyDAO $propertyDAO)
     {
-        $this->instantiator     = $instantiator;
-        $this->annotationReader = $annotationReader;
+        $this->instantiator  = $instantiator;
+        $this->annotationDAO = $annotationDAO;
+        $this->propertyDAO   = $propertyDAO;
     }
 
     /**
@@ -35,53 +49,49 @@ class ArrayValidator
      */
     public function isValid($class, array $data)
     {
+        $classInstance = $this->retrieveClass($class);
+        $properties    = $this->propertyDAO->getSynchronizedProperty($classInstance, $data);
+
+        foreach ($this->annotationDAO->getClassAnnotations($classInstance) as $contraint) {
+            if ($contraint instanceof Annotations\Synchronizer) {
+                $contraint->exec($classInstance, $data);
+            }
+        }
+
+        // Foreach the constraint and execute
+        foreach ($this->annotationDAO->getPropertyAnnotations($properties, $classInstance) as $contraintName => $childContraint) {
+            foreach ($childContraint as $contraint) {
+                $this->execAnnotation($contraint, $contraintName, $data);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $class
+     * @throws ValidationException
+     * @return \JsonSerializable
+     */
+    private function retrieveClass($class)
+    {
         if (is_object($class) === true) {
             $classInstance = $class;
         } else {
             try {
                 $classInstance = $this->instantiator->instantiate($class);
             } catch (InvalidArgumentException $e) {
-                throw new ValidationException($e->getMessage());
+                throw new ClassDoesNotExistException($e->getMessage());
             }
         }
 
         if (in_array('JsonSerializable', class_implements($classInstance)) === false) {
-            throw new ValidationException(
+            throw new InvalidTypeException(
                 sprintf('Class "%s" must implements "JsonSerializable"', get_class($classInstance))
             );
         }
 
-        $keys            = array_keys($classInstance->jsonSerialize());
-        $reflectionClass = new \ReflectionClass($class);
-
-        // Check if all key are there
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $data) === false) {
-                throw new ValidationException(sprintf('Key "%s" does not exist in "%s"', $key, json_encode($data)));
-            }
-        }
-
-        // Wake up annotation
-        new Annotations\Synchronizer();
-        new Annotations\PlainTextInstanceOf();
-        new Annotations\PlainTextClassImplements();
-        new Annotations\Chain();
-
-
-        foreach ($this->annotationReader->getClassAnnotations($reflectionClass) as $contraint) {
-            if ($contraint instanceof Annotations\Synchronizer) {
-                $contraint->exec($keys, $classInstance);
-            }
-        }
-
-        // Foreach the constraint and execute
-        foreach ($this->retrieveConstraint($keys, $classInstance) as $contraintName => $childContraint) {
-            foreach ($childContraint as $contraint) {
-                $this->execConstraint($contraint, $contraintName, $data);
-            }
-        }
-
-        return $data;
+        return $classInstance;
     }
 
     /**
@@ -90,11 +100,11 @@ class ArrayValidator
      * @param array $data
      * @throws ValidationException
      */
-    private function execConstraint($contraint, $contraintName, array $data)
+    private function execAnnotation($contraint, $contraintName, array $data)
     {
         if ($contraint instanceof Annotations\Chain) {
             if (is_array($data[$contraintName]) === false) {
-                throw new ValidationException(
+                throw new InvalidTypeException(
                     sprintf('"%s" must be and array in "%s"', $contraintName, json_encode($data))
                 );
             }
@@ -108,53 +118,5 @@ class ArrayValidator
         } else {
             $contraint->exec($data[$contraintName]);
         }
-    }
-
-    /**
-     * @param array $keys
-     * @param object $classInstance
-     * @return array
-     */
-    private function retrieveConstraint(array $keys, $classInstance)
-    {
-        // Retrieve the synchorinized property with return data by jsonSerialize
-        $sync = array();
-        foreach ($keys as $key) {
-            $camelCaseKey = $this->toCamelCase($key);
-            if (property_exists($classInstance, $camelCaseKey) === true) {
-                $sync[] = $camelCaseKey;
-            }
-        }
-
-        $contraints = array();
-
-        // Foreach the sync and retrieve the anotation
-        foreach ($sync as $property) {
-            $propertyReflection = new \ReflectionProperty($classInstance, $property);
-            $annotation         = $this->annotationReader->getPropertyAnnotations($propertyReflection);
-
-            if (empty($annotation) === false) {
-                $contraints[$property] = $annotation;
-            }
-        }
-
-        return $contraints;
-    }
-
-    /**
-     * @param string $value
-     * @return string
-     */
-    private function toCamelCase($value)
-    {
-        $value = preg_replace_callback(
-            '/_(\w)/',
-            function (array $matches) {
-                return ucfirst($matches[1]);
-            },
-            $value
-        );
-
-        return $value;
     }
 }

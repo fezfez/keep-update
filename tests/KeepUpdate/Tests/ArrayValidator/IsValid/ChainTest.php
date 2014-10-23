@@ -2,15 +2,13 @@
 
 namespace KeepUpdate\Tests\ArrayValidator\IsValid;
 
-use KeepUpdate\ArrayValidator;
-use Doctrine\Instantiator\Instantiator;
-use Doctrine\Common\Annotations\AnnotationReader;
+use KeepUpdate\ArrayValidatorFactory;
 
 class ChainTest extends \PHPUnit_Framework_TestCase
 {
     public function testClassFailWithChainIsNotAnArray()
     {
-        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = ArrayValidatorFactory::getInstance();
 
         $this->setExpectedException('KeepUpdate\ValidationException');
 
@@ -19,7 +17,7 @@ class ChainTest extends \PHPUnit_Framework_TestCase
 
     public function testClassFailWithChainDoesNotExist()
     {
-        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = ArrayValidatorFactory::getInstance();
 
         $this->setExpectedException('KeepUpdate\ValidationException');
 
@@ -28,7 +26,7 @@ class ChainTest extends \PHPUnit_Framework_TestCase
 
     public function testValidWithSimpleChain()
     {
-        $sUT    = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT    = ArrayValidatorFactory::getInstance();
         $result = array('test' => array('test' => 'chain !'));
 
         $this->assertEquals($result, $sUT->isValid('KeepUpdate\Tests\Sample\Chain', $result));
@@ -36,7 +34,7 @@ class ChainTest extends \PHPUnit_Framework_TestCase
 
     public function testValidWithMultipleChain()
     {
-        $sUT    = new ArrayValidator(new Instantiator(), new AnnotationReader());;
+        $sUT    = ArrayValidatorFactory::getInstance();;
         $result = array('test' => array('test' => array('test' => 'chain !')));
 
         $this->assertEquals($result, $sUT->isValid('KeepUpdate\Tests\Sample\ChainMultiple', $result));

@@ -2,9 +2,7 @@
 
 namespace KeepUpdate\Tests\ArrayValidator;
 
-use KeepUpdate\ArrayValidator;
-use Doctrine\Instantiator\Instantiator;
-use Doctrine\Common\Annotations\AnnotationReader;
+use KeepUpdate\ArrayValidatorFactory;
 use KeepUpdate\Tests\Sample\WithoutAnnotation;
 use KeepUpdate\Tests\Sample\WithoutJsonSerializableAndAnnotation;
 
@@ -12,7 +10,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 {
     public function testClassDoesNotExist()
     {
-        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = ArrayValidatorFactory::getInstance();
 
         $this->setExpectedException('KeepUpdate\ValidationException');
 
@@ -21,7 +19,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassFailWithoutAnnotationButNoSync()
     {
-        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = ArrayValidatorFactory::getInstance();
 
         $this->setExpectedException('KeepUpdate\ValidationException');
 
@@ -30,7 +28,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassFailWithoutAnnotationSyncButEmpty()
     {
-        $sUT = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT = ArrayValidatorFactory::getInstance();
 
         $this->setExpectedException('KeepUpdate\ValidationException');
 
@@ -39,7 +37,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassValidWithoutAnnotationAndSync()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'im in !');
 
         $this->assertEquals(
@@ -50,7 +48,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassValidWithoutAnnotationAndSyncWithRealInstance()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'im in !');
 
         $this->assertEquals(
@@ -61,7 +59,7 @@ class IsValidTest extends \PHPUnit_Framework_TestCase
 
     public function testClassValidWithoutAnnotationAndSyncAndJsonSerializableWithRealInstance()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'im in !');
 
         $this->setExpectedException('KeepUpdate\ValidationException');

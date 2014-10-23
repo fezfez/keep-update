@@ -2,15 +2,13 @@
 
 namespace KeepUpdate\Tests\ArrayValidator\IsValid;
 
-use KeepUpdate\ArrayValidator;
-use Doctrine\Instantiator\Instantiator;
-use Doctrine\Common\Annotations\AnnotationReader;
+use KeepUpdate\ArrayValidatorFactory;
 
 class PlainTextClassImplementsTest extends \PHPUnit_Framework_TestCase
 {
     public function testFailWithIsInstanceOfClassDoesNotExist()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'im in !');
 
         $this->setExpectedException('KeepUpdate\ValidationException');
@@ -20,7 +18,7 @@ class PlainTextClassImplementsTest extends \PHPUnit_Framework_TestCase
 
     public function testFailWithIsInstanceOfWrongClass()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'KeepUpdate\Tests\Sample\PlainTextInstanceOf');
 
         $this->setExpectedException('KeepUpdate\ValidationException');
@@ -33,7 +31,7 @@ class PlainTextClassImplementsTest extends \PHPUnit_Framework_TestCase
 
     public function testValidWithClassImplements()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => 'KeepUpdate\Tests\Sample\DummieImplementation');
 
         $this->assertEquals(
@@ -44,7 +42,7 @@ class PlainTextClassImplementsTest extends \PHPUnit_Framework_TestCase
 
     public function testValidWithIsInstanceOfNullable()
     {
-        $sUT  = new ArrayValidator(new Instantiator(), new AnnotationReader());
+        $sUT  = ArrayValidatorFactory::getInstance();
         $data = array('test' => null);
 
         $this->assertEquals(

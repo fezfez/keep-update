@@ -5,11 +5,9 @@ namespace KeepUpdate\Tests\Sample;
 use KeepUpdate\Annotations;
 
 /**
- * @author Stagiaire
- *
- * @Annotations\Synchronizer(strict=true);
+ * @Annotations\Synchronizer(strict=false);
  */
-class SynchronizerFail implements \JsonSerializable
+class SynchronizerNotStrict implements \JsonSerializable
 {
     private $test = null;
 

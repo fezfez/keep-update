@@ -8,20 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace KeepUpdate\Annotations;
+namespace KeepUpdate;
 
-/**
- * @Annotation
- *
- */
-class Chain
+class InvalidTypeException extends ValidationException
 {
-    /**
-     * @var string
-     */
-    public $class;
-    /**
-     * @var boolean
-     */
-    public $optional;
+
 }

@@ -58,8 +58,9 @@ class ArrayValidator
             }
         }
 
+        $propertiesAnnoration = $this->annotationDAO->getPropertyAnnotations($properties, $classInstance);
         // Foreach the constraint and execute
-        foreach ($this->annotationDAO->getPropertyAnnotations($properties, $classInstance) as $contraintName => $childContraint) {
+        foreach ($propertiesAnnoration as $contraintName => $childContraint) {
             foreach ($childContraint as $contraint) {
                 $this->execAnnotation($contraint, $contraintName, $data);
             }
@@ -69,7 +70,7 @@ class ArrayValidator
     }
 
     /**
-     * @param string $class
+     * @param string|object $class
      * @throws ValidationException
      * @return \JsonSerializable
      */

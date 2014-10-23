@@ -12,7 +12,7 @@
         "array",
         "dto",
         "validator",
-        "binding",
+        "binding"
     ],
     "homepage": "https://github.com/fezfez/keep-update",
     "license": "MIT",

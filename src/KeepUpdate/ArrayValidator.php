@@ -29,7 +29,7 @@ class ArrayValidator
     }
 
     /**
-     * @param string $class
+     * @param string|object $class
      * @param array $data
      * @throws \Exception
      */
@@ -133,7 +133,7 @@ class ArrayValidator
             $propertyReflection = new \ReflectionProperty($classInstance, $property);
             $annotation         = $this->annotationReader->getPropertyAnnotations($propertyReflection);
 
-            if (!empty($annotation)) {
+            if (empty($annotation) === false) {
                 $contraints[$property] = $annotation;
             }
         }

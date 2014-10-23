@@ -20,11 +20,7 @@ class Synchronizer
         if ($this->strict === true) {
             foreach ($keys as $key) {
                 $camelCaseKey = $this->toCamelCase($key);
-                $methodName   = 'set' . ucfirst($camelCaseKey);
 
-                /*if (method_exists($classInstance, $methodName) === false) {
-                    throw new \Exception(sprintf('"%s" not sync with method "%s"', $key, $methodName));
-                }*/
                 if (property_exists($classInstance, $camelCaseKey) === false) {
                     throw new ValidationException(
                         sprintf(
